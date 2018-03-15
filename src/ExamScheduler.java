@@ -12,7 +12,6 @@ public class ExamScheduler{
     private int crossoverProbability;
     private int mutationProbability;
     private List<Schedule> studentSchedules;
-    private Population population;
 
     ExamScheduler(){
         studentSchedules = new ArrayList<>();
@@ -25,21 +24,31 @@ public class ExamScheduler{
 
         generateStudentSchedules();
 
-        population = new Population(populationSize, numModulesTotal);
+        Population population = new Population();
 
-        population.generate();
+        population.randomlyGenerate(numDays, populationSize, numModulesTotal);
 
 
         for(int i = 0; i < studentSchedules.size(); i++) {
             System.out.println(studentSchedules.get(i));
         }
 
-        System.out.println();
-        System.out.println(population);
+        // TODO: cleaner solution for calculating fitness cost
+        // TODO: for each generation.
+        for(int i = 0; i < population.size(); i++){
+            population.get(i).calculateFitnessCost(studentSchedules);
+        }
 
-        Evaluator evaluator = new Evaluator(studentSchedules, numModulesTotal, numDays);
+        population.sort();
 
-        evaluator.getFitnessCost(population.getOrdering(0));
+        System.out.println("\n" + population);
+
+        Evolver evolver = new Evolver(mutationProbability, crossoverProbability);
+
+        for(int i = 0; i < numGenerations; i++){
+            population = evolver.getNextGeneration(population);
+            System.out.println(population);
+        }
     }
 
     private void initializeParameters(){
