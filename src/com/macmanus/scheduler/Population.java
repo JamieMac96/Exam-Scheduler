@@ -1,7 +1,8 @@
-import com.sun.org.apache.xpath.internal.operations.Or;
+package com.macmanus.scheduler;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Population{
@@ -28,7 +29,7 @@ public class Population{
                                  int numModulesTotal){
         for(int i = 0; i < populationSize; i++){
             Ordering ordering = new Ordering(numDays);
-            for(int j = 0; j < numModulesTotal; j++){
+            for(int j = 1; j <= numModulesTotal; j++){
                 ordering.add(j);
             }
 
@@ -37,42 +38,10 @@ public class Population{
         }
     }
 
-    public void sort() {
-        if (orderings == null || orderings.size()==0){
-            return;
+    public void calculateCosts(List<Schedule> studentSchedules){
+        for(Ordering ordering: orderings){
+            ordering.calculateFitnessCost(studentSchedules);
         }
-        quicksort(0, orderings.size() - 1);
-    }
-
-    private void quicksort(int low, int high) {
-        int i = low, j = high;
-        int pivot = orderings.get(low + (high-low)/2).getFitnessCost();
-
-        while (i <= j) {
-            while (orderings.get(i).getFitnessCost() < pivot) {
-                i++;
-            }
-            while (orderings.get(j).getFitnessCost() > pivot) {
-                j--;
-            }
-
-            if (i <= j) {
-                exchange(i, j);
-                i++;
-                j--;
-            }
-        }
-        // Recursion
-        if (low < j)
-            quicksort(low, j);
-        if (i < high)
-            quicksort(i, high);
-    }
-
-    private void exchange(int i, int j) {
-        Ordering temp = orderings.get(i);
-        orderings.set(i, orderings.get(j));
-        orderings.set(j, temp);
     }
 
     public void setOrderings(List<Ordering> orderings) {
@@ -83,6 +52,10 @@ public class Population{
         return orderings;
     }
 
+    public void sort(){
+        orderings.sort(Comparator.comparing(Ordering::getFitnessCost));
+    }
+
     @Override
     public String toString(){
         StringBuilder output = new StringBuilder("");
@@ -90,9 +63,13 @@ public class Population{
         for(int i = 0; i < orderings.size(); i++){
             output.append("Ordering ")
                   .append(Integer.toString(i + 1))
-                  .append(": ")
-                  .append(orderings.get(i).toString())
-                  .append(" Fitness Cost: ")
+                  .append(":");
+
+            for(Integer item: orderings.get(i).getOrdering()){
+                output.append(" ")
+                      .append(item);
+            }
+            output.append(" : Fitness Cost: ")
                   .append(orderings.get(i).getFitnessCost())
                   .append("\n");
         }

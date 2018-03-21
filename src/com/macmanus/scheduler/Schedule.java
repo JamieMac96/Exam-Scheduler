@@ -1,3 +1,5 @@
+package com.macmanus.scheduler;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -5,7 +7,7 @@ public class Schedule{
     private final int studentNum;
     private Set<Integer> moduleNumbers;
 
-    Schedule(int studentNum){
+    public Schedule(int studentNum){
         this.studentNum = studentNum;
         moduleNumbers = new HashSet<>();
     }
@@ -24,6 +26,16 @@ public class Schedule{
 
     @Override
     public String toString(){
-        return  "Student " + studentNum + ": " + moduleNumbers.toString();
+        String initial = "Student: " + studentNum + ": ";
+        StringBuilder output = new StringBuilder();
+
+        output.append(initial);
+
+        for(Integer moduleNumber: moduleNumbers){
+            output.append(moduleNumber);
+            output.append(" ");
+        }
+
+        return output.toString();
     }
 }

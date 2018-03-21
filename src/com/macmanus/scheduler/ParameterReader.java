@@ -1,3 +1,5 @@
+package com.macmanus.scheduler;
+
 import javax.swing.*;
 import java.util.Scanner;
 

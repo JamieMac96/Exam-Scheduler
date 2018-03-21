@@ -1,5 +1,8 @@
+package com.macmanus.scheduler;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class ExamScheduler{
 
@@ -13,7 +16,7 @@ public class ExamScheduler{
     private int mutationProbability;
     private List<Schedule> studentSchedules;
 
-    ExamScheduler(){
+    public ExamScheduler(){
         studentSchedules = new ArrayList<>();
     }
 
@@ -21,11 +24,9 @@ public class ExamScheduler{
     public void run(){
 
         initializeParameters();
-
         generateStudentSchedules();
 
         Population population = new Population();
-
         population.randomlyGenerate(numDays, populationSize, numModulesTotal);
 
 
@@ -33,25 +34,21 @@ public class ExamScheduler{
             System.out.println(studentSchedules.get(i));
         }
 
-        // TODO: cleaner solution for calculating fitness cost
-        // TODO: for each generation.
-        for(int i = 0; i < population.size(); i++){
-            population.get(i).calculateFitnessCost(studentSchedules);
-        }
-
+        population.calculateCosts(studentSchedules);
         population.sort();
-
         System.out.println("\n" + population);
 
         Evolver evolver = new Evolver(mutationProbability, crossoverProbability);
 
         for(int i = 0; i < numGenerations; i++){
             population = evolver.getNextGeneration(population);
+            population.calculateCosts(studentSchedules);
+            population.sort();
             System.out.println(population);
         }
     }
 
-    private void initializeParameters(){
+    public void initializeParameters(){
 
         ParameterReader reader = new ParameterReader();
 
@@ -81,13 +78,14 @@ public class ExamScheduler{
         }
     }
 
-    private void generateStudentSchedules(){
+    public void generateStudentSchedules(){
         Schedule studentSchedule;
+        Random myRand = new Random();
 
         for(int i = 1; i <= numStudents; i++){
             studentSchedule = new Schedule(i);
             while(studentSchedule.getModuleNumbers().size() < numModulesPerCourse){
-                int module = (int)(Math.random() * numModulesTotal);
+                int module = myRand.nextInt(numModulesTotal);
                 studentSchedule.addModule(module);
             }
             studentSchedules.add(studentSchedule);

@@ -1,3 +1,5 @@
+package com.macmanus.scheduler;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -8,28 +10,35 @@ public class Ordering{
     private int numDays;
     private int fitnessCost;
     private List<Integer> ordering;
-    private boolean processed;
 
     public Ordering(int days){
         numDays = days;
         ordering = new ArrayList<>();
-        processed = false;
     }
 
-    public boolean isProcessed() {
-        return processed;
-    }
-
-    public void setProcessed(boolean processed) {
-        this.processed = processed;
+    public Ordering(){
+        ordering = new ArrayList<>();
+        numDays = 1;
     }
 
     public int getFitnessCost() {
         return fitnessCost;
     }
 
+    public int getNumDays(){
+        return numDays;
+    }
+
     public void add(int item){
         ordering.add(item);
+    }
+
+    public void set(int index, int value){
+        ordering.set(index, value);
+    }
+
+    public void setNumDays(int numDays){
+        this.numDays = numDays;
     }
 
     public int get(int index){
@@ -38,6 +47,10 @@ public class Ordering{
 
     public int size(){
         return ordering.size();
+    }
+
+    public boolean contains(int item){
+        return ordering.contains(item);
     }
 
     List<Integer> getOrdering(){
