@@ -1,11 +1,11 @@
 package com.macmanus.scheduler;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class ExamScheduler{
-
     private int numGenerations;
     private int populationSize;
     private int numStudents;
@@ -22,34 +22,28 @@ public class ExamScheduler{
 
     // This method will be used to control the rest of the program
     public void run(){
-
+        EvolutionHandler eHandler = new EvolutionHandler(mutationProbability,
+                                                         crossoverProbability);
+        Population population = new Population();
         initializeParameters();
         generateStudentSchedules();
+        printStudentSchedules();
 
-        Population population = new Population();
         population.randomlyGenerate(numDays, populationSize, numModulesTotal);
-
-
-        for(int i = 0; i < studentSchedules.size(); i++) {
-            System.out.println(studentSchedules.get(i));
-        }
-
         population.calculateCosts(studentSchedules);
         population.sort();
-        System.out.println("\n" + population);
+        System.out.println("\nPopulation\n" + population);
 
-        Evolver evolver = new Evolver(mutationProbability, crossoverProbability);
 
         for(int i = 0; i < numGenerations; i++){
-            population = evolver.getNextGeneration(population);
+            population = eHandler.getNextGeneration(population);
             population.calculateCosts(studentSchedules);
             population.sort();
             System.out.println(population);
         }
     }
 
-    public void initializeParameters(){
-
+    private void initializeParameters(){
         ParameterReader reader = new ParameterReader();
 
         numGenerations = reader.getNumGenerations();
@@ -61,24 +55,10 @@ public class ExamScheduler{
         crossoverProbability = reader.getCrossoverProbability();
         mutationProbability = reader.getMutationProbability();
 
-        //Vaidate parameters.
-        while(!(numModulesTotal > numModulesPerCourse)){
-            System.out.println("Error! There are less total modules " +
-                               "than modules per course");
-
-            numModulesTotal = reader.getNumModulesTotal();
-            numModulesPerCourse = reader.getNumModulesPerCourse();
-        }
-
-        while(crossoverProbability + mutationProbability > 100){
-            System.out.println("Crossover and mutation probability sum " +
-                               "to be grater than 100");
-            crossoverProbability = reader.getCrossoverProbability();
-            mutationProbability = reader.getMutationProbability();
-        }
+        validateParameters(reader);
     }
 
-    public void generateStudentSchedules(){
+    private void generateStudentSchedules(){
         Schedule studentSchedule;
         Random myRand = new Random();
 
@@ -89,6 +69,41 @@ public class ExamScheduler{
                 studentSchedule.addModule(module);
             }
             studentSchedules.add(studentSchedule);
+        }
+    }
+
+    private void printStudentSchedules(){
+        for (Schedule studentSchedule : studentSchedules) {
+            System.out.println(studentSchedule);
+        }
+    }
+
+    private void validateParameters(ParameterReader reader){
+        String modulesError   = "Error! There are less total modules than "
+                              + "modules per course";
+        String sumError       = "Sum of crossover and mutation probability"
+                              + " is grater than 100";
+        String crossoverError = "Crossover probability cannot be 100 if "
+                              + "there are an even number of modules";
+
+
+        while(!(numModulesTotal > numModulesPerCourse)){
+            JOptionPane.showMessageDialog(null, modulesError);
+            numModulesTotal = reader.getNumModulesTotal();
+            numModulesPerCourse = reader.getNumModulesPerCourse();
+        }
+
+        while(crossoverProbability + mutationProbability > 100){
+            JOptionPane.showMessageDialog(null, sumError);
+            crossoverProbability = reader.getCrossoverProbability();
+            mutationProbability = reader.getMutationProbability();
+        }
+
+        if((numModulesTotal % 2) != 0){
+            while(crossoverProbability == 100){
+                JOptionPane.showMessageDialog(null, crossoverError);
+                crossoverProbability = reader.getCrossoverProbability();
+            }
         }
     }
 }

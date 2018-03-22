@@ -21,12 +21,16 @@ public class Ordering{
         numDays = 1;
     }
 
-    public int getFitnessCost() {
-        return fitnessCost;
+    public int get(int index){
+        return ordering.get(index);
     }
 
     public int getNumDays(){
         return numDays;
+    }
+
+    public int getFitnessCost() {
+        return fitnessCost;
     }
 
     public void add(int item){
@@ -35,14 +39,6 @@ public class Ordering{
 
     public void set(int index, int value){
         ordering.set(index, value);
-    }
-
-    public void setNumDays(int numDays){
-        this.numDays = numDays;
-    }
-
-    public int get(int index){
-        return ordering.get(index);
     }
 
     public int size(){
@@ -62,10 +58,9 @@ public class Ordering{
         int examsPerSession = (int) Math.ceil((double) this.size() / numDays);
         List<Set<Integer>> examSessions = getExamSessions(examsPerSession);
 
-        for(int i = 0; i < examSessions.size(); i++){
-            Set<Integer> currentExams = examSessions.get(i);
-            for(int j = 0; j < studentSchedules.size(); j++){
-                Set<Integer> schedule = studentSchedules.get(j).getModuleNumbers();
+        for(Set<Integer> currentExams : examSessions){
+            for(Schedule studentSchedule : studentSchedules){
+                Set<Integer> schedule = studentSchedule.getModuleNumbers();
                 Set<Integer> intersection = intersect(schedule, currentExams);
                 if(intersection.size() > 1){
                     cost++;
@@ -91,10 +86,8 @@ public class Ordering{
     }
 
     private List<Set<Integer>> getExamSessions(int examsPerSession){
-        // The overall schedule of the exams(not assoc. with students).
         List<Set<Integer>> examDays = new ArrayList<>();
-        Set<Integer> buffer = new HashSet<>();
-
+        Set<Integer> buffer         = new HashSet<>();
 
         for(int i = 0; i < ordering.size(); i++){
             buffer.add(ordering.get(i));
@@ -104,8 +97,8 @@ public class Ordering{
             }
         }
 
+        //Add remaining days to the List
         if(buffer.size() > 0) {
-            //Add remaining days to the List
             examDays.add(new HashSet<>(buffer));
         }
 

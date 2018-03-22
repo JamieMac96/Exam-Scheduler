@@ -12,16 +12,22 @@ public class Population{
         orderings = new ArrayList<>();
     }
 
-    public void add(Ordering ordering){
-        orderings.add(ordering);
+    public List<Ordering> getOrderings(){
+        return orderings;
     }
 
-    public int size(){
-        return orderings.size();
+    public void setOrderings(List<Ordering> orderings){
+        this.orderings = orderings;
     }
 
-    public Ordering get(int index){
-        return orderings.get(index);
+    public void sort(){
+        orderings.sort(Comparator.comparing(Ordering::getFitnessCost));
+    }
+
+    public void calculateCosts(List<Schedule> studentSchedules){
+        for(Ordering ordering: orderings){
+            ordering.calculateFitnessCost(studentSchedules);
+        }
     }
 
     public void randomlyGenerate(int numDays,
@@ -36,24 +42,6 @@ public class Population{
             Collections.shuffle(ordering.getOrdering());
             orderings.add(ordering);
         }
-    }
-
-    public void calculateCosts(List<Schedule> studentSchedules){
-        for(Ordering ordering: orderings){
-            ordering.calculateFitnessCost(studentSchedules);
-        }
-    }
-
-    public void setOrderings(List<Ordering> orderings) {
-        this.orderings = orderings;
-    }
-
-    public List<Ordering> getOrderings() {
-        return orderings;
-    }
-
-    public void sort(){
-        orderings.sort(Comparator.comparing(Ordering::getFitnessCost));
     }
 
     @Override

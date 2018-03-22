@@ -4,13 +4,6 @@ import javax.swing.*;
 import java.util.Scanner;
 
 public class ParameterReader{
-    private Scanner scanner;
-    private JFrame myFrame;
-
-    ParameterReader(){
-        myFrame = new JFrame();
-        scanner = new Scanner(System.in);
-    }
 
     int getNumGenerations(){
         return getIntInput("Enter the number of generations: ");
@@ -61,14 +54,28 @@ public class ParameterReader{
     }
 
     private int getIntInput(String message){
+        String errorMessage = "Error! Could not parse input to integer";
+        String input = JOptionPane.showInputDialog(null, message);
 
-        String input = JOptionPane.showInputDialog(myFrame, message);
-        int intInput = Integer.parseInt(input);
-        return intInput;
+        while(!tryParseInt(input)){
+            JOptionPane.showMessageDialog(null, errorMessage);
+            input = JOptionPane.showInputDialog(null, message);
+        }
+
+        return Integer.parseInt(input);
     }
 
-    private int getIntInputA(String message){
-        System.out.print(message);
-        return scanner.nextInt();
+    private boolean tryParseInt(String input){
+        // Exit the program if cancel is chosen
+        if(input == null){
+            System.exit(0);
+        }
+
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

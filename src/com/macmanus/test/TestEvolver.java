@@ -1,6 +1,6 @@
 package com.macmanus.test;
 
-import com.macmanus.scheduler.Evolver;
+import com.macmanus.scheduler.EvolutionHandler;
 import com.macmanus.scheduler.Ordering;
 import com.macmanus.scheduler.Population;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,14 +11,14 @@ import java.util.List;
 
 public class TestEvolver {
     private Population pop;
-    private Evolver evolver;
+    private EvolutionHandler evolver;
     private List<Ordering> orderingList;
 
     @BeforeEach
     void setUp(){
         orderingList = new ArrayList<>();
         pop = new Population();
-        evolver = new Evolver(33, 33);
+        evolver = new EvolutionHandler(33, 33);
 
         pop.setOrderings(orderingList);
     }

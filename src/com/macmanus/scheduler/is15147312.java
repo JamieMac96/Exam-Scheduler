@@ -7,5 +7,3 @@ public class is15147312 {
         scheduler.run();
     }
 }
-
-
