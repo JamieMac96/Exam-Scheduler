@@ -1,60 +1,73 @@
 package com.macmanus.scheduler;
 
 import javax.swing.*;
-import java.util.Scanner;
 
 public class ParameterReader{
 
     int getNumGenerations(){
-        return getIntInput("Enter the number of generations: ");
+        return getPositiveIntInput("Enter the number of generations: ");
     }
 
     int getPopulationSize(){
-        return getIntInput("Enter the population size: ");
+        return getPositiveIntInput("Enter the population size: ");
     }
 
     int getNumStudents(){
-        return getIntInput("Enter the number of students: ");
+        return getPositiveIntInput("Enter the number of students: ");
     }
 
     int getNumModulesTotal(){
-        return getIntInput("Enter the total number of modules: ");
+        String message = "Enter the total number of modules: ";
+        String errorMessage = "Error! there must be atleast 2 modules";
+        int numModules = getPositiveIntInput(message);
+
+        while(numModules < 2){
+            JOptionPane.showMessageDialog(null, errorMessage);
+            numModules = getPositiveIntInput(message);
+        }
+
+        return numModules;
     }
 
     int getNumModulesPerCourse(){
-        return getIntInput("Enter the number of modules for the course: ");
+        return getPositiveIntInput("Enter the number of modules for the course: ");
     }
 
     int getNumDays(){
-        return getIntInput("Enter the number of exam days: ");
+        return getPositiveIntInput("Enter the number of exam days: ");
     }
 
     int getCrossoverProbability(){
-        int prob = getIntInput("Enter the crossover probability (0-100): ");
+        String message      = "Enter the crossover probability (0-100): ";
+        String errorMessage = "Crossover probability must be in the range" +
+                              " (0-100). Try again: ";
+        int prob = getPositiveIntInput(message);
 
         //Ensure valid probability is entered.
         while(prob < 0 || prob > 100){
-            prob = getIntInput("Crossover probability must be in the range" +
-                    " (0-100). Try again: ");
+            prob = getPositiveIntInput(errorMessage);
         }
 
         return prob;
     }
 
     int getMutationProbability(){
-        int prob =  getIntInput("Enter the mutation probability (1-100): ");
+        String message      = "Enter the mutation probability (0-100): ";
+        String errorMessage = "Mutation probability must be in the range" +
+                              " (0-100). Try again: ";
+
+        int prob =  getPositiveIntInput(message);
 
         //Ensure valid probability is entered.
         while(prob < 0 || prob > 100){
-            prob = getIntInput("Mutation probability must be in the range" +
-                    " (0-100). Try again: ");
+            prob = getPositiveIntInput(errorMessage);
         }
 
         return prob;
     }
 
-    private int getIntInput(String message){
-        String errorMessage = "Error! Could not parse input to integer";
+    private int getPositiveIntInput(String message){
+        String errorMessage = "Error! Could not parse input to positive integer";
         String input = JOptionPane.showInputDialog(null, message);
 
         while(!tryParseInt(input)){
@@ -72,8 +85,8 @@ public class ParameterReader{
         }
 
         try {
-            Integer.parseInt(input);
-            return true;
+            int val = Integer.parseInt(input);
+            return val >= 0;
         } catch (NumberFormatException e) {
             return false;
         }

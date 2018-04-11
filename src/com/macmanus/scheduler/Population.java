@@ -1,9 +1,6 @@
 package com.macmanus.scheduler;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class Population{
     private List<Ordering> orderings;
@@ -33,15 +30,22 @@ public class Population{
     public void randomlyGenerate(int numDays,
                                  int populationSize,
                                  int numModulesTotal){
-        for(int i = 0; i < populationSize; i++){
+
+        // Populate a set to ensure that the initial population has
+        // unique orderings
+        Set<Ordering> initialPop = new HashSet<>();
+
+        while(initialPop.size() < populationSize){
             Ordering ordering = new Ordering(numDays);
             for(int j = 1; j <= numModulesTotal; j++){
                 ordering.add(j);
             }
 
             Collections.shuffle(ordering.getOrdering());
-            orderings.add(ordering);
+            initialPop.add(ordering);
         }
+
+        orderings = new ArrayList<>(initialPop);
     }
 
     @Override
@@ -51,13 +55,10 @@ public class Population{
         for(int i = 0; i < orderings.size(); i++){
             output.append("Ordering ")
                   .append(Integer.toString(i + 1))
-                  .append(":");
+                  .append(": ");
 
-            for(Integer item: orderings.get(i).getOrdering()){
-                output.append(" ")
-                      .append(item);
-            }
-            output.append(" : Fitness Cost: ")
+            output.append(orderings.get(i).toString());
+            output.append("Fitness Cost: ")
                   .append(orderings.get(i).getFitnessCost())
                   .append("\n");
         }

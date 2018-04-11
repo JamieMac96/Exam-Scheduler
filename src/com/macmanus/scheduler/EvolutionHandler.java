@@ -22,7 +22,8 @@ public class EvolutionHandler {
         Population nextGeneration   = new Population();
         List<Ordering> filteredOrderings = filterOrderings(currentGeneration);
 
-        // When we apply a technique to the filtered orderings we
+        // When we apply a technique to the filtered orderings we remove
+        // those orderings from the list.
         while(filteredOrderings.size() > 0){
             GaTechnique technique = chooseTechnique();
             applyTechnique(technique, filteredOrderings, newOrderings);
@@ -77,19 +78,23 @@ public class EvolutionHandler {
 
     private void applyMutation(List<Ordering> filteredOrderings,
                                List<Ordering> newOrderings){
-        int randomIndex = rand.nextInt(filteredOrderings.size());
-        Ordering orderingToMutate = filteredOrderings.get(randomIndex);
+        int chosenIndex = rand.nextInt(filteredOrderings.size());
+        Ordering orderingToMutate = filteredOrderings.get(chosenIndex);
 
-        // Select two random items from the ordering and swap their positions
+        // Select two distinct random items from the ordering and
+        // swap their positions
         int indexOne = rand.nextInt(orderingToMutate.size());
-        int indexTwo = rand.nextInt(orderingToMutate.size());
+        int indexTwo;
+        while((indexTwo = rand.nextInt(orderingToMutate.size())) == indexOne);
+
         int valueOne = orderingToMutate.get(indexOne);
         int valueTwo = orderingToMutate.get(indexTwo);
+
         orderingToMutate.set(indexOne, valueTwo);
         orderingToMutate.set(indexTwo, valueOne);
 
         newOrderings.add(orderingToMutate);
-        filteredOrderings.remove(randomIndex);
+        filteredOrderings.remove(chosenIndex);
 
     }
 
@@ -98,15 +103,16 @@ public class EvolutionHandler {
         if(filteredOrderings.size() < 2) return;
 
         int indexOne = rand.nextInt(filteredOrderings.size());
-        int indexTwo = indexOne;
-        while(indexTwo == indexOne){
-            indexTwo = rand.nextInt(filteredOrderings.size());
-        }
+        int indexTwo;
+        while((indexTwo = rand.nextInt(filteredOrderings.size())) == indexOne);
 
         Ordering parentOne = filteredOrderings.get(indexOne);
         Ordering parentTwo = filteredOrderings.get(indexTwo);
-        Ordering childOne  = getChildOrdering(parentOne, parentTwo);
-        Ordering childTwo  = getChildOrdering(parentTwo, parentOne);
+
+        int cutPoint = getCutPoint(parentOne);
+
+        Ordering childOne  = getChildOrdering(parentOne, parentTwo, cutPoint);
+        Ordering childTwo  = getChildOrdering(parentTwo, parentOne, cutPoint);
 
         newOrderings.add(childOne);
         newOrderings.add(childTwo);
@@ -124,16 +130,16 @@ public class EvolutionHandler {
     }
 
     private Ordering getChildOrdering(Ordering parentOne,
-                                      Ordering parentTwo){
+                                      Ordering parentTwo,
+                                      int cutPoint){
         Ordering child = new Ordering(parentOne.getNumDays());
-        int orderingSize = parentOne.size();
-        int cutPoint = rand.nextInt(orderingSize - 4) + 2;
+        int numModules = parentOne.size();
 
         List<Integer> requiredItems = new ArrayList<>(parentOne.getOrdering());
         List<Integer> preCutoff = getSubOrdering(parentOne,0, cutPoint);
         List<Integer> postCutoff = getSubOrdering(parentTwo,
                                                   cutPoint,
-                                                  orderingSize);
+                                                  numModules);
 
         requiredItems.removeAll(preCutoff);
         requiredItems.removeAll(postCutoff);
@@ -142,6 +148,8 @@ public class EvolutionHandler {
             child.add(aPreCutoff);
         }
 
+        // Remove duplicate modules and replace them with
+        // the modules that are not yet a part of the child ordering
         for(Integer aPostCutoff : postCutoff){
             if(child.contains(aPostCutoff)){
                 child.add(requiredItems.remove(0));
@@ -182,5 +190,18 @@ public class EvolutionHandler {
         }
 
         return subList;
+    }
+
+    private int getCutPoint(Ordering ordering){
+        int numModules = ordering.size();
+        int cutPoint;
+
+        // If the number of modules is less than 4 then we have no range
+        // to work with and just choose the middle as the cutpoint.
+        if(numModules < 4){
+            return numModules / 2;
+        }
+
+        return rand.nextInt(numModules - 2) + 1;
     }
 }
