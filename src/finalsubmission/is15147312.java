@@ -19,11 +19,11 @@ public class is15147312 {
 
         // Validate program parameters
         String modulesError   = "Error! There are less total modules than "
-                + "modules per course";
+                              + "modules per course";
         String sumError       = "Error! Sum of crossover and mutation probability"
-                + " is grater than 100";
+                              + " is grater than 100";
         String crossoverError = "Error! Crossover probability cannot be 100 if "
-                + "there are an even number of modules";
+                              + "there are an even number of modules";
         String popSizeError   = "Error! Population size is too large";
 
         while(!(numModulesTotal > numModulesPerCourse)){
@@ -52,6 +52,8 @@ public class is15147312 {
             populationSize = reader.getPopulationSize();
         }
 
+
+        // Create and run the scheduler
         ExamScheduler scheduler = new ExamScheduler
                 .Builder()
                 .numGenerations(numGenerations)
@@ -87,8 +89,9 @@ class ParameterReader{
     }
 
     public int getNumModulesTotal(){
-        String message = "Enter the total number of modules: ";
+        String message      = "Enter the total number of modules: ";
         String errorMessage = "Error! there must be atleast 2 modules";
+
         int numModules = getPositiveIntInput(message);
 
         while(numModules < 2){
@@ -110,7 +113,8 @@ class ParameterReader{
     public int getCrossoverProbability(){
         String message      = "Enter the crossover probability (0-100): ";
         String errorMessage = "Crossover probability must be in the range" +
-                " (0-100). Try again: ";
+                              " (0-100). Try again: ";
+
         int prob = getPositiveIntInput(message);
 
         //Ensure valid probability is entered.
@@ -196,10 +200,11 @@ class ExamScheduler{
 
     // This method will be used to control the rest of the program
     public void run(){
-        EvolutionHandler eHandler = new EvolutionHandler(mutationProbability,
-                crossoverProbability);
-        Population population     = new Population();
         Scanner scanner           = new Scanner(System.in);
+        Population population     = new Population();
+        EvolutionHandler eHandler = new EvolutionHandler(mutationProbability,
+                                                         crossoverProbability);
+
         generateStudentSchedules();
         printStudentSchedules();
 
@@ -208,17 +213,14 @@ class ExamScheduler{
         population.sort();
 
         scanner.nextLine();
-        System.out.println("\nGeneration 0\n" + population);
-        System.out.println("-------------------------------------------");
 
-
-        for(int i = 0; i < numGenerations; i++){
+        for(int i = 0; i <= numGenerations; i++){
+            System.out.println("Generation " + (i));
+            System.out.println(population);
+            System.out.println("-------------------------------------------");
             population = eHandler.getNextGeneration(population);
             population.calculateCosts(studentSchedules);
             population.sort();
-            System.out.println("Generation " + (i+1));
-            System.out.println(population);
-            System.out.println("-------------------------------------------");
         }
     }
 
@@ -254,7 +256,6 @@ class ExamScheduler{
         private int crossoverProbability;
         private int mutationProbability;
         private List<Schedule> studentSchedules;
-
 
         public Builder populationSize(int populationSize) {
             this.populationSize = populationSize;
@@ -352,7 +353,6 @@ class EvolutionHandler {
     private int mutationProbability;
     private int crossoverProbability;
     private Random rand;
-
 
     public EvolutionHandler(int mutationProbability, int crossoverProbability){
         this.mutationProbability  = mutationProbability;
@@ -484,8 +484,8 @@ class EvolutionHandler {
         List<Integer> requiredItems = new ArrayList<>(parentOne.getOrdering());
         List<Integer> preCutoff = getSubOrdering(parentOne,0, cutPoint);
         List<Integer> postCutoff = getSubOrdering(parentTwo,
-                cutPoint,
-                numModules);
+                                                  cutPoint,
+                                                  numModules);
 
         requiredItems.removeAll(preCutoff);
         requiredItems.removeAll(postCutoff);
@@ -511,20 +511,20 @@ class EvolutionHandler {
     private List<Ordering> getFilteredOrderings(List<Ordering> currentOrderings,
                                                 int setSize,
                                                 int altSetSize){
-
         List<Ordering> filteredOrderings = new ArrayList<>();
 
         for(int i = 0; i < setSize; i++){
             filteredOrderings.add(currentOrderings.get(i));
         }
+
         for(int i = setSize; i < setSize + altSetSize; i++){
             filteredOrderings.add(currentOrderings.get(i));
         }
+
         for(int i = 0; i < setSize; i++){
             filteredOrderings.add(currentOrderings.get(i));
         }
 
-        System.out.println("\n");
         return filteredOrderings;
     }
 
@@ -542,7 +542,6 @@ class EvolutionHandler {
 
     private int getCutPoint(Ordering ordering){
         int numModules = ordering.size();
-        int cutPoint;
 
         // If the number of modules is less than 4 then we have no range
         // to work with and just choose the middle as the cutpoint.
@@ -582,9 +581,7 @@ class Population{
     public void randomlyGenerate(int numDays,
                                  int populationSize,
                                  int numModulesTotal){
-
-        // Populate a set to ensure that the initial population has
-        // unique orderings
+        // Use set to ensure that the initial population has unique orderings
         Set<Ordering> initialPop = new HashSet<>();
 
         while(initialPop.size() < populationSize){
@@ -691,7 +688,7 @@ class Ordering{
         builder.append("\n");
 
         List<List<Integer>> examSessions = getExamSessionsList();
-        List<String> rows = getRows(examSessions);
+        List<String> rows = getSessionRows(examSessions);
 
         for (int i = 0; i < examSessions.size(); i++) {
             builder.append("Session ").append(i + 1).append("\t");
@@ -767,7 +764,7 @@ class Ordering{
         return examDays;
     }
 
-    private List<String> getRows(List<List<Integer>> examSessions) {
+    private List<String> getSessionRows(List<List<Integer>> examSessions) {
         List<String> rows = new ArrayList<>();
 
         for(int j = 0; j < examSessions.get(0).size(); j++){
